@@ -59,6 +59,7 @@
             justify-content: center;
             overflow: hidden;
             padding: 12px;
+            padding-top: 48px;
         }
 
         .hud-bar {
@@ -112,6 +113,7 @@
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.08s ease-out;
+            margin: auto;
         }
 
         /* 機臂 */
@@ -186,6 +188,7 @@
             position: absolute;
             top: 0; left: 0;
             z-index: 2;
+            opacity: 0;
         }
 
         /* CW: M1(左前), M4(右後)  —  CCW: M2(右前), M3(左後) */
@@ -206,7 +209,7 @@
         .arc-fill {
             fill: none;
             stroke-width: 5;
-            stroke-linecap: round;
+            stroke-linecap: butt;
             stroke-dasharray: 289.03;
             stroke-dashoffset: 289.03;
             transition: stroke-dashoffset 0.1s ease-out;
@@ -369,6 +372,7 @@
         .throttle-gauge .gauge-needle {
             fill: #E2E8F0;
             transform-origin: 60px 60px;
+            transform: rotate(-90deg);
             transition: transform 0.1s ease;
         }
         .throttle-gauge .gauge-center {
