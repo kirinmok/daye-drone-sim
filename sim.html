@@ -759,6 +759,17 @@ const gamepad = {
     index: null,
     prevReset: false,
 };
+const bridge = {
+    connected: false,
+    ws: null,
+    prevReset: false,
+    jx: 0,
+    jy: 0,
+    rx: 0,
+    ry: 0,
+    cross: 0,
+    start: 0,
+};
 
 function applyDeadzone(v, deadzone = 0.25) {
     return Math.abs(v) < deadzone ? 0 : Math.max(-1, Math.min(1, v));
@@ -776,9 +787,60 @@ function resetDroneControls() {
     stickR.reset();
 }
 
+function applyBridgeControls() {
+    const yawX = applyDeadzone(bridge.jx || 0);
+    const throttleY = applyDeadzone(-(bridge.jy || 0));
+    const rollX = applyDeadzone(bridge.rx || 0);
+    const pitchY = applyDeadzone(-(bridge.ry || 0));
+
+    stickL.setNormalized(yawX, throttleY);
+    stickR.setNormalized(rollX, pitchY);
+
+    const resetPressed = !!bridge.cross || !!bridge.start;
+    if (resetPressed && !bridge.prevReset) {
+        resetDroneControls();
+    }
+    bridge.prevReset = resetPressed;
+}
+
+function connectLocalBridge() {
+    try {
+        const ws = new WebSocket('ws://localhost:8765');
+        bridge.ws = ws;
+        ws.onopen = () => {
+            bridge.connected = true;
+            setGamepadStatus('PS2 手把：本地橋接已連線', true);
+        };
+        ws.onclose = () => {
+            bridge.connected = false;
+            bridge.ws = null;
+            if (!gamepad.connected) {
+                setGamepadStatus('PS2 手把：未連線', false);
+            }
+            setTimeout(connectLocalBridge, 1500);
+        };
+        ws.onerror = () => ws.close();
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                bridge.jx = Number(data.jx) || 0;
+                bridge.jy = Number(data.jy) || 0;
+                bridge.rx = Number(data.rx) || 0;
+                bridge.ry = Number(data.ry) || 0;
+                bridge.cross = Number(data.cross ?? data.a ?? 0) ? 1 : 0;
+                bridge.start = Number(data.start ?? 0) ? 1 : 0;
+                bridge.connected = true;
+                applyBridgeControls();
+            } catch (_) {}
+        };
+    } catch (_) {
+        setTimeout(connectLocalBridge, 1500);
+    }
+}
+
 function pollGamepad() {
     if (!navigator.getGamepads) {
-        setGamepadStatus('PS2 手把：瀏覽器不支援 Gamepad API', false);
+        setGamepadStatus(bridge.connected ? 'PS2 手把：本地橋接已連線' : 'PS2 手把：瀏覽器不支援 Gamepad API', bridge.connected);
         return;
     }
 
@@ -788,7 +850,12 @@ function pollGamepad() {
         gamepad.connected = false;
         gamepad.index = null;
         gamepad.prevReset = false;
-        setGamepadStatus('PS2 手把：未連線', false);
+        if (bridge.connected) {
+            setGamepadStatus('PS2 手把：本地橋接已連線', true);
+            applyBridgeControls();
+        } else {
+            setGamepadStatus('PS2 手把：未連線', false);
+        }
         return;
     }
 
@@ -827,9 +894,11 @@ window.addEventListener('gamepaddisconnected', e => {
         gamepad.connected = false;
         gamepad.index = null;
         gamepad.prevReset = false;
-        setGamepadStatus('PS2 手把：未連線', false);
+        setGamepadStatus(bridge.connected ? 'PS2 手把：本地橋接已連線' : 'PS2 手把：未連線', bridge.connected);
     }
 });
+
+connectLocalBridge();
 
 // ===== PHYSICS =====
 const propEls = ['p1', 'p2', 'p3', 'p4'].map(id => document.getElementById(id));
