@@ -543,7 +543,7 @@
 
         <div class="hud-bar">
             <div style="font-size:12px;color:var(--dim);font-weight:700;letter-spacing:.06em;">
-                PS2 Mode 2：左搖桿 = 油門 / 偏航 | 右搖桿 = Pitch / Roll | 十字鍵 = 姿態備援 | ✕ / Start = 歸零
+                PS2：左搖桿 = 油門（預設在最下，往上推才加油） | 右搖桿 = 方向 | 十字鍵 = 方向備援 | ✕ / Start = 歸零
             </div>
             <div id="gamepadStatus" style="font-size:12px;color:#94a3b8;margin-top:6px;">PS2 手把：未連線</div>
         </div>
@@ -787,13 +787,22 @@ function resetDroneControls() {
     stickR.reset();
 }
 
+function mapThrottleFromGamepadAxis(axisValue) {
+    const up = Math.max(0, -applyDeadzone(axisValue || 0));
+    return 1 - up * 2;
+}
+
+function mapThrottleFromBridgeAxis(axisValue) {
+    const up = Math.max(0, applyDeadzone(axisValue || 0));
+    return 1 - up * 2;
+}
+
 function applyBridgeControls() {
-    const yawX = applyDeadzone(bridge.jx || 0);
-    const throttleY = applyDeadzone(-(bridge.jy || 0));
+    const throttleY = mapThrottleFromBridgeAxis(bridge.jy || 0);
     const rollX = applyDeadzone(bridge.rx || 0);
     const pitchY = applyDeadzone(-(bridge.ry || 0));
 
-    stickL.setNormalized(yawX, throttleY);
+    stickL.setNormalized(0, throttleY);
     stickR.setNormalized(rollX, pitchY);
 
     const resetPressed = !!bridge.cross || !!bridge.start;
@@ -869,12 +878,11 @@ function pollGamepad() {
     const dpadLeft = !!(gp.buttons[14] && gp.buttons[14].pressed);
     const resetPressed = !!(gp.buttons[0] && gp.buttons[0].pressed) || !!(gp.buttons[9] && gp.buttons[9].pressed);
 
-    const yawX = applyDeadzone(gp.axes[0] || 0);
-    const throttleY = applyDeadzone(gp.axes[1] || 0);
+    const throttleY = mapThrottleFromGamepadAxis(gp.axes[1] || 0);
     const rollX = dpadLeft ? -1 : dpadRight ? 1 : applyDeadzone(gp.axes[2] || 0);
     const pitchY = dpadUp ? -1 : dpadDown ? 1 : applyDeadzone(gp.axes[3] || 0);
 
-    stickL.setNormalized(yawX, throttleY);
+    stickL.setNormalized(0, throttleY);
     stickR.setNormalized(rollX, pitchY);
 
     if (resetPressed && !gamepad.prevReset) {
@@ -906,12 +914,11 @@ const pwrEls = ['pwr1', 'pwr2', 'pwr3', 'pwr4'].map(id => document.getElementByI
 const arcEls = ['arc1', 'arc2', 'arc3', 'arc4'].map(id => document.getElementById(id));
 const ARC_CIRC = 2 * Math.PI * 46; // ≈ 289.03
 
-let curRoll = 0, curPitch = 0, curYaw = 0;
+let curRoll = 0, curPitch = 0;
 
 function tick() {
     pollGamepad();
     const throttle = Math.round(Math.max(0, Math.min(100, (1 - (stickL.y + 1) / 2) * 100)));
-    const yaw = Math.round(stickL.x * 100);
     const pitch = Math.round(stickR.y * -100);
     const roll = Math.round(stickR.x * 100);
 
@@ -930,13 +937,13 @@ function tick() {
     }
 
     // Mixer
-    const pM = pitch * 0.3, rM = roll * 0.3, yM = yaw * 0.2;
+    const pM = pitch * 0.3, rM = roll * 0.3;
     let m = [0, 0, 0, 0];
     if (throttle > 0) {
-        m[0] = throttle - pM + rM + yM;  // M1 左前
-        m[1] = throttle - pM - rM - yM;  // M2 右前
-        m[2] = throttle + pM + rM - yM;  // M3 左後
-        m[3] = throttle + pM - rM + yM;  // M4 右後
+        m[0] = throttle - pM + rM;  // M1 左前
+        m[1] = throttle - pM - rM;  // M2 右前
+        m[2] = throttle + pM + rM;  // M3 左後
+        m[3] = throttle + pM - rM;  // M4 右後
     }
     m = m.map(v => Math.max(0, Math.min(100, Math.round(v))));
 
@@ -956,23 +963,19 @@ function tick() {
     const pF = ((m[2] + m[3]) - (m[0] + m[1])) * 1.0;
     const gR = -curRoll * 0.35;
     const gP = -curPitch * 0.35;
-    const gY = -curYaw * 0.18;
 
     if (throttle === 0) {
         curRoll += (0 - curRoll) * 0.25;
         curPitch += (0 - curPitch) * 0.25;
-        curYaw += (0 - curYaw) * 0.18;
     } else {
         curRoll += (rF + gR - curRoll) * 0.35;
         curPitch += (pF + gP - curPitch) * 0.35;
-        curYaw += (yaw * 0.22 + gY - curYaw) * 0.2;
     }
     curRoll = Math.max(-25, Math.min(25, curRoll));
     curPitch = Math.max(-25, Math.min(25, curPitch));
-    curYaw = Math.max(-35, Math.min(35, curYaw));
 
     document.getElementById('droneBody').style.transform =
-        `rotateX(${curPitch}deg) rotateY(${curRoll}deg) rotateZ(${curYaw}deg)`;
+        `rotateX(${curPitch}deg) rotateY(${curRoll}deg)`;
     document.getElementById('droneGlow').classList.toggle('on', throttle > 0);
 
     requestAnimationFrame(tick);
