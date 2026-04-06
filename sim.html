@@ -533,110 +533,16 @@
             .motor-mount { width: 85px; height: 85px; }
         }
 
-        @media (max-width: 640px) {
-            .ctrl-zone {
-                padding-left: 8px;
-                padding-right: 8px;
-            }
-            .sticks-row {
-                justify-content: space-between;
-                gap: 8px;
-                align-items: flex-end;
-            }
-            .stick-col {
-                flex: 1 1 0;
-                min-width: 0;
-            }
-            .stick-col .cn-label {
-                font-size: 14px;
-                letter-spacing: 0.5px;
-            }
-            .stick-col .en-label {
-                font-size: 9px;
-                letter-spacing: 1px;
-                margin-bottom: 3px;
-            }
-            .mid-controls {
-                flex: 0 0 88px;
-                min-width: 88px;
-                padding-bottom: 2px;
-            }
-            .throttle-digital {
-                font-size: 20px;
-            }
-            .throttle-gauge-wrap,
-            .throttle-gauge {
-                width: 88px;
-            }
-            .throttle-gauge-wrap {
-                height: 48px;
-            }
-            .mid-title-main {
-                font-size: 10px;
-                letter-spacing: 1.5px;
-            }
-            .daye-text {
-                font-size: 15px;
-                letter-spacing: 2px;
-            }
-            .mid-title-sub {
-                font-size: 8px;
-                letter-spacing: 1.5px;
-                margin-top: 2px;
-            }
-            .stick-base {
-                width: min(26vw, 108px);
-                height: min(26vw, 108px);
-            }
-            .stick-knob {
-                width: 38px;
-                height: 38px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .sticks-row {
-                gap: 6px;
-            }
-            .mid-controls {
-                flex-basis: 76px;
-                min-width: 76px;
-            }
-            .throttle-digital {
-                font-size: 18px;
-            }
-            .throttle-gauge-wrap,
-            .throttle-gauge {
-                width: 76px;
-            }
-            .throttle-gauge-wrap {
-                height: 42px;
-            }
-            .stick-base {
-                width: min(25vw, 96px);
-                height: min(25vw, 96px);
-            }
-            .stick-knob {
-                width: 34px;
-                height: 34px;
-            }
-            .stick-col .cn-label {
-                font-size: 13px;
-            }
-            .mid-title-main {
-                font-size: 9px;
-            }
-            .daye-text {
-                font-size: 13px;
-            }
-        }
-
         @media (max-width: 640px) and (orientation: portrait) {
             .app {
                 grid-template-rows: minmax(300px, 56dvh) auto 0;
             }
             .app > div:last-child {
                 display: none;
+            }
+            .ctrl-zone {
+                padding-left: 8px;
+                padding-right: 8px;
             }
             .viz-zone {
                 padding-top: 56px;
@@ -667,6 +573,15 @@
             }
             .stick-col:last-child {
                 align-items: flex-end;
+            }
+            .stick-col .cn-label {
+                font-size: 14px;
+                letter-spacing: 0.5px;
+            }
+            .stick-col .en-label {
+                font-size: 9px;
+                letter-spacing: 1px;
+                margin-bottom: 3px;
             }
             .mid-controls {
                 position: absolute;
@@ -712,6 +627,41 @@
             .stick-knob {
                 width: 40px;
                 height: 40px;
+            }
+        }
+
+        @media (max-width: 420px) and (orientation: portrait) {
+            .stick-col .cn-label {
+                font-size: 13px;
+            }
+            .mid-controls {
+                width: 84px;
+                top: -60px;
+            }
+            .throttle-digital {
+                font-size: 17px;
+            }
+            .throttle-gauge-wrap,
+            .throttle-gauge {
+                width: 74px;
+            }
+            .throttle-gauge-wrap {
+                height: 40px;
+            }
+            .mid-title-main {
+                font-size: 8px;
+            }
+            .daye-text {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+            .stick-base {
+                width: min(30vw, 108px);
+                height: min(30vw, 108px);
+            }
+            .stick-knob {
+                width: 36px;
+                height: 36px;
             }
         }
     </style>
