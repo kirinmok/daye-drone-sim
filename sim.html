@@ -964,13 +964,14 @@ function tick() {
 
     for (let i = 0; i < 4; i++) {
         pwrEls[i].textContent = m[i] > 0 ? m[i] + '%' : '';
+        const visualMotor = throttle > 0 ? Math.max(m[i], 8) : 0;
         // 轉速：低油門就快，高油門極快
-        const spd = Math.pow(m[i] / 100, 1.5);
-        propEls[i].style.animationDuration = m[i] === 0 ? '0s' : (0.3 / (1 + spd * 5)) + 's';
+        const spd = Math.pow(visualMotor / 100, 1.5);
+        propEls[i].style.animationDuration = visualMotor === 0 ? '0s' : (0.3 / (1 + spd * 5)) + 's';
         // 透明度：保持可見，高速時稍淡但仍看得到旋轉
-        const opacity = m[i] === 0 ? 0.25 : Math.max(0.35, 1 - m[i] / 200);
+        const opacity = visualMotor === 0 ? 0.25 : Math.max(0.35, 1 - visualMotor / 200);
         propEls[i].style.opacity = opacity;
-        arcEls[i].style.strokeDashoffset = ARC_CIRC * (1 - m[i] / 100);
+        arcEls[i].style.strokeDashoffset = ARC_CIRC * (1 - visualMotor / 100);
     }
 
     // Physics — 自穩永遠開啟
