@@ -633,7 +633,7 @@
 
         @media (max-width: 640px) and (orientation: portrait) {
             .app {
-                grid-template-rows: minmax(0, 1fr) auto 0;
+                grid-template-rows: minmax(300px, 56dvh) auto 0;
             }
             .app > div:last-child {
                 display: none;
@@ -641,11 +641,12 @@
             .viz-zone {
                 padding-top: 56px;
                 padding-bottom: 12px;
-                justify-content: center;
+                justify-content: flex-start;
             }
             .drone-stage {
                 width: min(72vw, 72vh, 320px);
                 height: min(72vw, 72vh, 320px);
+                margin-top: 20px;
             }
             .ctrl-zone {
                 padding-top: 78px;
