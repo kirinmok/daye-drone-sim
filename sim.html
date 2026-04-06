@@ -533,6 +533,12 @@
             .motor-mount { width: 85px; height: 85px; }
         }
 
+        @media (pointer: coarse) and (min-width: 641px) {
+            .hud-bar {
+                display: none;
+            }
+        }
+
         @media (max-width: 640px) and (orientation: portrait) {
             .app {
                 grid-template-rows: minmax(300px, 56dvh) auto 0;
