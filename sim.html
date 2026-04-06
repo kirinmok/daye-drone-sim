@@ -579,7 +579,7 @@
             }
             .ctrl-zone {
                 padding-top: 78px;
-                padding-bottom: max(12px, env(safe-area-inset-bottom));
+                padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
             }
             .sticks-row {
                 position: relative;
@@ -630,7 +630,7 @@
             .mid-title {
                 position: fixed;
                 left: 50%;
-                bottom: calc(env(safe-area-inset-bottom) + 1px);
+                bottom: calc(env(safe-area-inset-bottom) + 8px);
                 transform: translateX(-50%);
                 margin-top: 0;
                 text-align: center;
