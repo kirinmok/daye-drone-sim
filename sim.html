@@ -538,27 +538,7 @@
                 grid-template-rows: minmax(300px, 56dvh) auto 0;
             }
             .hud-bar {
-                top: auto;
-                left: 50%;
-                right: auto;
-                bottom: calc(env(safe-area-inset-bottom) + 44px);
-                transform: translateX(-50%);
-                justify-content: center;
-                padding-top: 0;
-                z-index: 30;
-            }
-            .hud-bar > div:first-child {
                 display: none;
-            }
-            #gamepadStatus {
-                margin-top: 0 !important;
-                font-size: 11px !important;
-                background: rgba(8, 12, 20, 0.78);
-                border: 1px solid rgba(56, 189, 248, 0.18);
-                border-radius: 999px;
-                padding: 6px 12px;
-                backdrop-filter: blur(8px);
-                white-space: nowrap;
             }
             .app > div:last-child {
                 display: none;
@@ -579,7 +559,7 @@
             }
             .ctrl-zone {
                 padding-top: 78px;
-                padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
             }
             .sticks-row {
                 position: relative;
@@ -614,29 +594,21 @@
                 z-index: 3;
                 flex: none;
                 min-width: auto;
-                width: 110px;
+                width: 96px;
                 pointer-events: none;
             }
             .throttle-digital {
-                font-size: 20px;
+                font-size: 18px;
             }
             .throttle-gauge-wrap,
             .throttle-gauge {
-                width: 104px;
+                width: 82px;
             }
             .throttle-gauge-wrap {
-                height: 58px;
-                overflow: visible;
+                height: 44px;
             }
             .mid-title {
-                position: fixed;
-                left: 50%;
-                bottom: calc(env(safe-area-inset-bottom) + 8px);
-                transform: translateX(-50%);
-                margin-top: 0;
-                text-align: center;
-                z-index: 29;
-                width: max-content;
+                margin-top: 2px;
             }
             .mid-title-main {
                 font-size: 9px;
@@ -666,19 +638,18 @@
                 font-size: 13px;
             }
             .mid-controls {
-                width: 96px;
+                width: 84px;
                 top: -60px;
             }
             .throttle-digital {
-                font-size: 18px;
+                font-size: 17px;
             }
             .throttle-gauge-wrap,
             .throttle-gauge {
-                width: 88px;
+                width: 74px;
             }
             .throttle-gauge-wrap {
-                height: 50px;
-                overflow: visible;
+                height: 40px;
             }
             .mid-title-main {
                 font-size: 8px;
@@ -1127,7 +1098,7 @@ function tick() {
     m = m.map(v => Math.max(0, Math.min(100, Math.round(v))));
 
     for (let i = 0; i < 4; i++) {
-        pwrEls[i].textContent = throttle > 0 ? (m[i] + '%') : '';
+        pwrEls[i].textContent = m[i] > 0 ? m[i] + '%' : '';
 
         // 視覺顯示與真實混控分離：
         // 對角線打到底時，實際某顆馬達可能非常低，但畫面上仍保留最低可見轉速，
