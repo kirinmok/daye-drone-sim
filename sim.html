@@ -940,10 +940,22 @@ function tick() {
     const pM = pitch * 0.3, rM = roll * 0.3;
     let m = [0, 0, 0, 0];
     if (throttle > 0) {
-        m[0] = throttle - pM + rM;  // M1 左前
-        m[1] = throttle - pM - rM;  // M2 右前
-        m[2] = throttle + pM + rM;  // M3 左後
-        m[3] = throttle + pM - rM;  // M4 右後
+        const mix = [
+            -pM + rM,  // M1 左前
+            -pM - rM,  // M2 右前
+             pM + rM,  // M3 左後
+             pM - rM   // M4 右後
+        ];
+
+        // 方向打到極限時，按目前油門自動縮放混控量，避免單顆馬達被壓成 0。
+        const maxMix = Math.max(...mix);
+        const minMix = Math.min(...mix);
+        let mixScale = 1;
+        if (maxMix > 0) mixScale = Math.min(mixScale, (100 - throttle) / maxMix);
+        if (minMix < 0) mixScale = Math.min(mixScale, throttle / (-minMix));
+        mixScale = Math.max(0, Math.min(1, mixScale));
+
+        m = mix.map(v => throttle + v * mixScale);
     }
     m = m.map(v => Math.max(0, Math.min(100, Math.round(v))));
 
@@ -953,7 +965,7 @@ function tick() {
         const spd = Math.pow(m[i] / 100, 1.5);
         propEls[i].style.animationDuration = m[i] === 0 ? '0s' : (0.3 / (1 + spd * 5)) + 's';
         // 透明度：保持可見，高速時稍淡但仍看得到旋轉
-        const opacity = m[i] === 0 ? 0 : Math.max(0.35, 1 - m[i] / 200);
+        const opacity = m[i] === 0 ? 0.25 : Math.max(0.35, 1 - m[i] / 200);
         propEls[i].style.opacity = opacity;
         arcEls[i].style.strokeDashoffset = ARC_CIRC * (1 - m[i] / 100);
     }
