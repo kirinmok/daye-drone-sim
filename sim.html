@@ -538,7 +538,27 @@
                 grid-template-rows: minmax(300px, 56dvh) auto 0;
             }
             .hud-bar {
+                top: auto;
+                left: 50%;
+                right: auto;
+                bottom: calc(env(safe-area-inset-bottom) + 8px);
+                transform: translateX(-50%);
+                justify-content: center;
+                padding-top: 0;
+                z-index: 30;
+            }
+            .hud-bar > div:first-child {
                 display: none;
+            }
+            #gamepadStatus {
+                margin-top: 0 !important;
+                font-size: 11px !important;
+                background: rgba(8, 12, 20, 0.78);
+                border: 1px solid rgba(56, 189, 248, 0.18);
+                border-radius: 999px;
+                padding: 6px 12px;
+                backdrop-filter: blur(8px);
+                white-space: nowrap;
             }
             .app > div:last-child {
                 display: none;
