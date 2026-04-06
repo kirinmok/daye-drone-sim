@@ -964,13 +964,22 @@ function tick() {
 
     for (let i = 0; i < 4; i++) {
         pwrEls[i].textContent = m[i] > 0 ? m[i] + '%' : '';
-        const visualMotor = throttle > 0 ? Math.max(m[i], 8) : 0;
-        // 轉速：低油門就快，高油門極快
-        const spd = Math.pow(visualMotor / 100, 1.5);
-        propEls[i].style.animationDuration = visualMotor === 0 ? '0s' : (0.3 / (1 + spd * 5)) + 's';
-        // 透明度：保持可見，高速時稍淡但仍看得到旋轉
-        const opacity = visualMotor === 0 ? 0.25 : Math.max(0.35, 1 - visualMotor / 200);
+
+        // 視覺顯示與真實混控分離：
+        // 對角線打到底時，實際某顆馬達可能非常低，但畫面上仍保留最低可見轉速，
+        // 避免螺旋槳剛好停在與機臂重疊的位置，看起來像整顆消失。
+        const minVisibleMotor = throttle > 0 ? 18 : 0;
+        const visualMotor = throttle > 0 ? Math.max(m[i], minVisibleMotor) : 0;
+
+        // 轉速：保留最低可見旋轉，高油門再加快
+        const spd = Math.pow(visualMotor / 100, 1.15);
+        propEls[i].style.animationDuration = visualMotor === 0 ? '0s' : (0.22 / (0.35 + spd * 3.2)) + 's';
+
+        // 透明度不要太低，避免在對角線極限時視覺上「少一顆」
+        const opacity = visualMotor === 0 ? 0.28 : Math.max(0.62, 0.92 - visualMotor / 260);
         propEls[i].style.opacity = opacity;
+        propEls[i].style.visibility = visualMotor === 0 ? 'hidden' : 'visible';
+
         arcEls[i].style.strokeDashoffset = ARC_CIRC * (1 - visualMotor / 100);
     }
 
