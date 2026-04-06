@@ -918,6 +918,9 @@ let curRoll = 0, curPitch = 0;
 
 function tick() {
     pollGamepad();
+    if (!gamepad.connected && !bridge.connected && !stickL.active && Math.abs(stickL.y) < 0.01) {
+        stickL.setNormalized(0, 1);
+    }
     const throttle = Math.round(Math.max(0, Math.min(100, (1 - (stickL.y + 1) / 2) * 100)));
     const pitch = Math.round(stickR.y * -100);
     const roll = Math.round(stickR.x * 100);
@@ -992,6 +995,7 @@ function tick() {
 
     requestAnimationFrame(tick);
 }
+resetDroneControls();
 requestAnimationFrame(tick);
 
 </script>
