@@ -1097,7 +1097,7 @@ function tick() {
     m = m.map(v => Math.max(0, Math.min(100, Math.round(v))));
 
     for (let i = 0; i < 4; i++) {
-        pwrEls[i].textContent = m[i] > 0 ? m[i] + '%' : '';
+        pwrEls[i].textContent = throttle > 0 ? (m[i] + '%') : '';
 
         // 視覺顯示與真實混控分離：
         // 對角線打到底時，實際某顆馬達可能非常低，但畫面上仍保留最低可見轉速，
