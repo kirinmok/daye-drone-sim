@@ -1084,15 +1084,15 @@ function tick() {
              pM - rM   // M4 右後
         ];
 
-        // 方向打到極限時，按目前油門自動縮放混控量，避免單顆馬達被壓成 0。
+        // 保留方向控制餘量：先縮小過大的差值，再調低共同油門。
+        // 100% 油門命令不代表四顆都必須一直維持 100%。
         const maxMix = Math.max(...mix);
         const minMix = Math.min(...mix);
-        let mixScale = 1;
-        if (maxMix > 0) mixScale = Math.min(mixScale, (100 - throttle) / maxMix);
-        if (minMix < 0) mixScale = Math.min(mixScale, throttle / (-minMix));
-        mixScale = Math.max(0, Math.min(1, mixScale));
-
-        m = mix.map(v => throttle + v * mixScale);
+        const mixScale = Math.min(1, 100 / Math.max(1, maxMix - minMix));
+        const adjustedMax = maxMix * mixScale;
+        const adjustedMin = minMix * mixScale;
+        const collective = Math.max(-adjustedMin, Math.min(100 - adjustedMax, throttle));
+        m = mix.map(v => collective + v * mixScale);
     }
     m = m.map(v => Math.max(0, Math.min(100, Math.round(v))));
 
